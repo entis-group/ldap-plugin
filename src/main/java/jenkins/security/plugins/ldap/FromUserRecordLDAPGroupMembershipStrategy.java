@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 public class FromUserRecordLDAPGroupMembershipStrategy extends LDAPGroupMembershipStrategy {
 
     private static final Logger LOGGER = Logger.getLogger(FromUserRecordLDAPGroupMembershipStrategy.class.getName());
-    private final String attributeName;
+    private String attributeName;
 
     @DataBoundConstructor
     public FromUserRecordLDAPGroupMembershipStrategy(String attributeName) {
@@ -60,32 +60,35 @@ public class FromUserRecordLDAPGroupMembershipStrategy extends LDAPGroupMembersh
         return StringUtils.defaultIfEmpty(attributeName, "memberOf");
     }
 
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
+    }
+
     @Override
     public GrantedAuthority[] getGrantedAuthorities(LdapUserDetails ldapUser) {
         List<GrantedAuthority> result = new ArrayList<GrantedAuthority>();
         Attributes attributes = ldapUser.getAttributes();
         final String attributeName = getAttributeName();
-        Attribute attribute = attributes == null ? null : attributes.get(attributeName);
-        if (attribute != null) {
-            try {
-                for (Object value: Collections.list(attribute.getAll())) {
-                    String groupName = String.valueOf(value);
-                    try {
-                        LdapName dn = new LdapName(groupName);
-                        groupName = String.valueOf(dn.getRdn(dn.size() - 1).getValue());
-                    } catch (InvalidNameException e) {
+            Attribute attribute = attributes == null ? null : attributes.get(attributeName);
+            if (attribute != null) {
+                try {
+                    for (Object value : Collections.list(attribute.getAll())) {
+                        String groupName = String.valueOf(value);
+                        try {
+                            LdapName dn = new LdapName(groupName);
+                            groupName = String.valueOf(dn.getRdn(dn.size() - 1).getValue());
+                        } catch (InvalidNameException e) {
                         LOGGER.log(Level.FINEST, "Expected a Group DN but found: {0}", groupName);
+                        }
+                        result.add(new GrantedAuthorityImpl(groupName));
                     }
-                    result.add(new GrantedAuthorityImpl(groupName));
-                }
-            } catch (NamingException e) {
+                } catch (NamingException e) {
                 LogRecord lr = new LogRecord(Level.FINE,
                         "Failed to retrieve member of attribute ({0}) from LDAP user details");
                 lr.setThrown(e);
                 lr.setParameters(new Object[]{attributeName});
                 LOGGER.log(lr);
             }
-
         }
         return result.toArray(new GrantedAuthority[result.size()]);
     }

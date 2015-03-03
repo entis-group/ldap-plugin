@@ -40,6 +40,7 @@ import hudson.util.ListBoxModel;
 import hudson.util.Scrambler;
 import hudson.util.Secret;
 import hudson.util.spring.BeanBuilder;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,6 +62,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -68,9 +70,11 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+
 import jenkins.model.Jenkins;
 import jenkins.security.plugins.ldap.FromGroupSearchLDAPGroupMembershipStrategy;
 import jenkins.security.plugins.ldap.LDAPGroupMembershipStrategy;
+
 import org.acegisecurity.AcegiSecurityException;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
